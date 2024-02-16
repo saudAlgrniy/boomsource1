@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نموذج بيانات الفيلم أو المسلسل</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 20px;
+  }
+
+  form {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  label {
+    font-weight: bold;
+  }
+
+  input[type="text"],
+  textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+  }
+
+  button {
+    padding: 10px 20px;
+    background-color: #4caf50;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+  }
+
+  button:hover {
+    background-color: #45a049;
+  }
+
+  #sourceCode {
+    width: 100%;
+    padding: 10px;
+    margin-top: 20px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    resize: vertical;
+  }
+
+  #copyBtn {
+    padding: 10px 20px;
+    background-color: #008CBA;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  #copyBtn:hover {
+    background-color: #005F6B;
+  }
+</style>
+<script>
+var serverFieldsCount = 1; // العدد الابتدائي لحقول السيرفر
+var downloadFieldsCount = 1; // العدد الابتدائي لحقول التنزيل
+
+window.onload = function() {
+  updateSourceCode();
+};
+
+function addServerFields() {
+  serverFieldsCount++;
+  var serverFieldsContainer = document.getElementById("serverFieldsContainer");
+  serverFieldsContainer.innerHTML += `
+    <label for="server${serverFieldsCount}Link">رابط السيرفر ${serverFieldsCount}:</label><br>
+    <input type="text" id="server${serverFieldsCount}Link" name="server${serverFieldsCount}Link" oninput="updateSourceCode()"><br>
+    
+    <label for="server${serverFieldsCount}Name">اسم السيرفر ${serverFieldsCount}:</label><br>
+    <input type="text" id="server${serverFieldsCount}Name" name="server${serverFieldsCount}Name" oninput="updateSourceCode()"><br>
+  `;
+  updateSourceCode();
+}
+
+function addDownloadFields() {
+  downloadFieldsCount++;
+  var downloadFieldsContainer = document.getElementById("downloadFieldsContainer");
+  downloadFieldsContainer.innerHTML += `
+    <label for="downloadLink${downloadFieldsCount}">رابط التنزيل ${downloadFieldsCount}:</label><br>
+    <input type="text" id="downloadLink${downloadFieldsCount}" name="downloadLink${downloadFieldsCount}" oninput="updateSourceCode()"><br>
+    
+    <label for="downloadButtonName${downloadFieldsCount}">اسم زر التنزيل ${downloadFieldsCount}:</label><br>
+    <input type="text" id="downloadButtonName${downloadFieldsCount}" name="downloadButtonName${downloadFieldsCount}" oninput="updateSourceCode()"><br>
+    
+    <label for="quality${downloadFieldsCount}">جودة الفيلم ${downloadFieldsCount}:</label><br>
+    <input type="text" id="quality${downloadFieldsCount}" name="quality${downloadFieldsCount}" oninput="updateSourceCode()"><br>
+    
+    <label for="videoPlayerName${downloadFieldsCount}">اسم مشغل الفيديو ${downloadFieldsCount}:</label><br>
+    <input type="text" id="videoPlayerName${downloadFieldsCount}" name="videoPlayerName${downloadFieldsCount}" oninput="updateSourceCode()"><br><br>
+  `;
+  updateSourceCode();
+}
+
+function updateSourceCode() {
+  // احصل على قيم حقول الإدخال من المستخدم
+  var image1 = document.getElementById("image1").value;
+  var story = document.getElementById("story").value;
+  var title = document.getElementById("title").value;
+  var category = document.getElementById("category").value;
+  var duration = document.getElementById("duration").value;
+  
+  // تحديث السورس كود مع القيم المدخلة
+  var sourceCode = `
+<p>&nbsp;</p>
+<div class="separator" style="clear: both; text-align: center;">
+  <a href="${image1}" imageanchor="1" style="margin-left: 1em; margin-right: 1em;">
+    <img border="0" data-original-height="420" data-original-width="315" height="320" src="${image1}" width="240" />
+  </a>
+</div>
+<br /><p></p>
+<br />
+<div class="taqdim-post">
+  <ul>
+    <li>
+    </li>
+  </ul>
+</div>
+<div class="tabs">
+  <input type="radio" name="tabs" id="tabone" checked="checked">
+  <label for="tabone">عن الفيلم</label>
+  <div class="tab">
+    <h1>
+      <div class='lef_data_post'>
+        <div class="detalis-post">
+          <ul>
+            <li><span>القصة :</span> ${story}</li>
+            <li><span>الاسم :</span> ${title}</li>
+            <li><span>التصنيف :</span> ${category}</li>
+            <li><span>مدة العرض :</span> ${duration}</li>
+          </ul>
+        </div>
+      </div>
+    </h1>
+  </div>
+  <input type="radio" name="tabs" id="tabtwo">
+  <label for="tabtwo">مشاهدة الأن</label>
+  <div class="tab">
+    <h1>
+      <div class="serversfilm">
+        <div class="item-page">
+          <h1>
+            <strong>
+              <div style="text-align:center;">
+               ${getServerFieldsHTML()}
+              </div>
+              <div id="monitor">
+                <div id="in-mon">
+                  <div style="text-align: center;">
+                    <iframe allowfullscreen="" frameborder="0" height="360" marginheight="0" marginwidth="0" name="myframe" scrolling="no" src="${document.getElementById("server1Link").value}" width="100%"></iframe>
+                  </div>
+                  <div class="clr"></div>
+                </div>
+              </div>
+            </strong>
+          </h1>
+        </div>
+      </div>
+    </h1>
+  </div>
+  <input type="radio" name="tabs" id="tabthree">
+  <label for="tabthree">تحميل الأن</label>
+  <div class="tab">
+    <h1>
+      <div class='downfilm'>
+        <p class="title"> تحميل الفيلم : اختر سيرفر مناسب لك </p>
+        <div class="downloadsList">
+          ${getDownloadFieldsHTML()}
+        </div>
+      </div>
+    </h1>
+  </div>
+</div>
+`;
+  // عرض السورس كود المحدث
+  document.getElementById("sourceCode").innerText = sourceCode;
+}
+
+function getServerFieldsHTML() {
+  var serverFieldsHTML = "";
+  for (var i = 1; i <= serverFieldsCount; i++) {
+    serverFieldsHTML += `
+      <input onclick="myframe.location.href='${document.getElementById('server'+i+'Link').value}'" type="button" value="${document.getElementById('server'+i+'Name').value}" />
+    `;
+  }
+  return serverFieldsHTML;
+}
+
+function getDownloadFieldsHTML() {
+  var downloadFieldsHTML = "";
+  for (var i = 1; i <= downloadFieldsCount; i++) {
+    downloadFieldsHTML += `
+      <li>
+        <a target="_blank" rel="nofollow" href="${document.getElementById('downloadLink'+i).value}">
+          <i class="fa fa-download"></i>
+          <span class="name">${document.getElementById('downloadButtonName'+i).value}</span>
+          <span class="quality">${document.getElementById('quality'+i).value}</span>
+          <span class="size">${document.getElementById('videoPlayerName'+i).value}</span>
+        </a>
+      </li>
+    `;
+  }
+  return downloadFieldsHTML;
+}
+</script>
+</head>
+<body>
+
+<form>
+  <label for="image1">رابط الصورة 1:</label><br>
+  <input type="text" id="image1" name="image1" oninput="updateSourceCode()"><br>
+  
+  <label for="story">قصة الفيلم أو المسلسل:</label><br>
+  <textarea id="story" name="story" rows="4" cols="50" oninput="updateSourceCode()"></textarea><br>
+  
+  <label for="title">اسم الفيلم أو المسلسل:</label><br>
+  <input type="text" id="title" name="title" oninput="updateSourceCode()"><br>
+  
+  <label for="category">تصنيف الفيلم أو المسلسل:</label><br>
+  <input type="text" id="category" name="category" oninput="updateSourceCode()"><br>
+  
+  <label for="duration">مدة عرض الفيلم أو المسلسل:</label><br>
+  <input type="text" id="duration" name="duration" oninput="updateSourceCode()"><br>
+  
+  <div id="serverFieldsContainer">
+    <!-- حقول السيرفر -->
+    <label for="server1Link">رابط السيرفر 1:</label><br>
+    <input type="text" id="server1Link" name="server1Link" oninput="updateSourceCode()"><br>
+    
+    <label for="server1Name">اسم السيرفر 1:</label><br>
+    <input type="text" id="server1Name" name="server1Name" oninput="updateSourceCode()"><br>
+  </div>
+  
+  <div id="downloadFieldsContainer">
+    <!-- حقول التنزيل -->
+    <label for="downloadLink1">رابط التنزيل 1:</label><br>
+    <input type="text" id="downloadLink1" name="downloadLink1" oninput="updateSourceCode()"><br>
+    
+    <label for="downloadButtonName1">اسم زر التنزيل 1:</label><br>
+    <input type="text" id="downloadButtonName1" name="downloadButtonName1" oninput="updateSourceCode()"><br>
+    
+    <label for="quality1">جودة الفيلم 1:</label><br>
+    <input type="text" id="quality1" name="quality1" oninput="updateSourceCode()"><br>
+    
+    <label for="videoPlayerName1">اسم مشغل الفيديو 1:</label><br>
+    <input type="text" id="videoPlayerName1" name="videoPlayerName1" oninput="updateSourceCode()"><br><br>
+  </div>
+  
+  <button type="button" onclick="addServerFields()">إضافة حقول سيرفر جديدة</button>
+  <button type="button" onclick="addDownloadFields()">إضافة حقول تنزيل جديدة</button>
+</form> 
+
+<div>
+  <h3>السورس كود المحدث:</h3>
+  <textarea id="sourceCode" rows="10" cols="80"></textarea>
+  <button id="copyBtn" onclick="copySourceCode()">نسخ السورس كود</button>
+</div>
+
+<script>
+function copySourceCode() {
+  var sourceCodeTextArea = document.getElementById("sourceCode");
+  sourceCodeTextArea.select();
+  document.execCommand("copy");
+}
+</script>
+
+</body>
+</html>
