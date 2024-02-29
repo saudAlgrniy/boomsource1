@@ -5,79 +5,79 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>نموذج بيانات الفيلم أو المسلسل</title>
 <style>
-  body {
+ body {
     font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
+   background-color: #f8f9fa;
     margin: 0;
-    padding: 20px;
-  }
+   padding: 20px;
+}
 
-  form {
+form {
     background-color: #fff;
     padding: 20px;
-    border-radius: 10px;
+   border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
+}
 
-  label {
+label {
     font-weight: bold;
-  }
+    color: #333;
+}
 
-  input[type="text"],
-  textarea {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
+input[type="text"],
+textarea,
+select {
+   width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+   border: 1px solid #ced4da;
     box-sizing: border-box;
-  }
+    font-size: 16px;
+    color: #555;
+    background-color: #f9f9f9;
+}
 
-  button {
-    padding: 10px 20px;
-    background-color: #4caf50;
+button {
+    padding: 12px 24px;
+    background-color: #007bff;
     color: #fff;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
-    margin-right: 10px;
-  }
+    font-size: 16px;
+}
 
-  button:hover {
-    background-color: #45a049;
-  }
+button:hover {
+    background-color: #0056b3;
+}
 
-  select {
+#sourceCode {
     width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-  }
-
-  #sourceCode {
-    width: 100%;
-    padding: 10px;
+    padding: 15px;
     margin-top: 20px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
+    border-radius: 8px;
+    border: 1px solid #ced4da;
     box-sizing: border-box;
     resize: vertical;
-  }
+    font-size: 16px;
+    color: #555;
+    background-color: #f9f9f9;
+}
 
-  #copyBtn {
-    padding: 10px 20px;
-    background-color: #008CBA;
+#copyBtn {
+    padding: 12px 24px;
+    background-color: #28a745;
     color: #fff;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
-  }
+    font-size: 16px;
+}
 
-  #copyBtn:hover {
-    background-color: #005F6B;
-  }
+#copyBtn:hover {
+    background-color: #218838;
+}
 </style>
 <script>
 var serverFieldsCount = 1; // العدد الابتدائي لحقول السيرفر
@@ -113,6 +113,7 @@ function addDownloadFields() {
     
     <label for="quality${downloadFieldsCount}">جودة الفيلم [${downloadFieldsCount} ]</label><br>
     <select id="quality${downloadFieldsCount}" name="quality${downloadFieldsCount}" onchange="updateSourceCode()">
+      <option value="">فراغ</option>
       <option value="BluRay">BluRay</option>
       <option value="BRrip">BRrip</option>
       <option value="BDRip">BDRip</option>
@@ -123,9 +124,18 @@ function addDownloadFields() {
     
     <label for="videoPlayerName${downloadFieldsCount}">اسم مشغل الفيديو [${downloadFieldsCount} ]</label><br>
     <select id="videoPlayerName${downloadFieldsCount}" name="videoPlayerName${downloadFieldsCount}" onchange="updateSourceCode()">
+      <option value="">فراغ</option>
       <option value="VLC">VLC</option>
       <option value="Mx Player">Mx Player</option>
+      
     </select><br><br>
+
+    <label for="downloadOption${downloadFieldsCount}">خيار التنزيل [${downloadFieldsCount} ]</label><br>
+    <select id="downloadOption${downloadFieldsCount}" name="downloadOption${downloadFieldsCount}" onchange="updateSourceCode()">
+      <option value="play">مشاهدة</option>
+      <option value="cc">ملف ترجمة</option>
+    </select><br><br>
+
     <hr>
   `;
   updateSourceCode();
@@ -136,8 +146,9 @@ function updateSourceCode() {
   var image1 = document.getElementById("image1").value;
   var story = document.getElementById("story").value;
   var title = document.getElementById("title").value;
-  var category = document.getElementById("category").value;
+  var category = Array.from(document.getElementById("category").selectedOptions).map(option => option.value).join(', ');
   var duration = document.getElementById("duration").value;
+  var contentType = document.getElementById("contentType").value; // قيمة نوع المحتوى
   
   // تحديث السورس كود مع القيم المدخلة
   var sourceCode = `
@@ -157,14 +168,14 @@ function updateSourceCode() {
 </div>
 <div class="tabs">
   <input type="radio" name="tabs" id="tabone" checked="checked">
-  <label for="tabone">عن الفيلم</label>
+  <label for="tabone">عن ${contentType}</label> <!-- تحديث عنوان الفيلم أو المسلسل -->
   <div class="tab">
     <h1>
       <div class='lef_data_post'>
         <div class="detalis-post">
           <ul>
             <li><span>القصة :</span> ${story}</li>
-                        <li><span>الاسم :</span> ${title}</li>
+            <li><span>الاسم :</span> ${title}</li>
             <li><span>التصنيف :</span> ${category}</li>
             <li><span>مدة العرض :</span> ${duration}</li>
           </ul>
@@ -231,7 +242,7 @@ function getDownloadFieldsHTML() {
     downloadFieldsHTML += `
       <li>
         <a target="_blank" rel="nofollow" href="${document.getElementById('downloadLink'+i).value}">
-          <i class="fa fa-download"></i>
+          <i class="fa fa-${document.getElementById('downloadOption'+i).value}"></i>
           <span class="name">${document.getElementById('downloadButtonName'+i).value}</span>
           <span class="quality">${document.getElementById('quality'+i).value}</span>
           <span class="size">${document.getElementById('videoPlayerName'+i).value}</span>
@@ -252,7 +263,13 @@ function copySourceCode() {
 <body>
 
 <form>
-  <label for="image1">رابط بوستر الفيلم </label><br>
+  <label for="contentType">نوع المحتوى</label><br>
+  <select id="contentType" name="contentType" onchange="updateSourceCode()">
+    <option value="الفيلم">الفيلم</option>
+    <option value="المسلسل">المسلسل</option>
+  </select><br><br>
+
+  <label for="image1">رابط بوستر الفيلم أو المسلسل</label><br>
   <input type="text" id="image1" name="image1" oninput="updateSourceCode()"><br>
   
   <label for="story">قصة الفيلم أو المسلسل</label><br>
@@ -262,33 +279,55 @@ function copySourceCode() {
   <input type="text" id="title" name="title" oninput="updateSourceCode()"><br>
   
   <label for="category">تصنيف الفيلم أو المسلسل</label><br>
-  <input type="text" id="category" name="category" oninput="updateSourceCode()"><br>
+  <select id="category" name="category" onchange="updateSourceCode()" multiple>
+    <option value="دراما">دراما</option>
+    <option value="حركة">حركة</option>
+    <option value="جريمة">جريمة</option>
+    <option value="رعب">رعب</option>
+    <option value="خيال علمي">خيال علمي</option>
+    <option value="كوميديا">كوميديا</option>
+    <option value="رومانسية">رومانسية</option>
+    <option value="مغامرة">مغامرة</option>
+    <option value="وثائقي">وثائقي</option>
+    <option value="تاريخي">تاريخي</option>
+    <option value="حربي">حربي</option>
+    <option value="خيالي">خيالي</option>
+    <option value="إثارة">إثارة</option>
+    <option value="رومانسية درامية">رومانسية درامية</option>
+    <option value="فانتازيا">فانتازيا</option>
+    <option value="رسوم متحركة">رسوم متحركة</option>
+    <option value="عائلي">عائلي</option>
+    <option value="موسيقى">موسيقى</option>
+    <option value="رياضة">رياضة</option>
+  </select><br><br>
   
-  <label for="duration">مدة عرض الفيلم أو المسلسل</label><br>
-  <input type="text" id="duration" name="duration" oninput="updateSourceCode()"><br><br><br><hr>
-  
+  <label for="duration">مدة الفيلم أو المسلسل</label><br>
+  <input type="text" id="duration" name="duration" oninput="updateSourceCode()"><br>
+
+  <hr>
+
   <div id="serverFieldsContainer">
-    <!-- حقول السيرفر -->
-    
     <label for="server1Link">رابط السيرفر [ 1 ]</label><br>
     <input type="text" id="server1Link" name="server1Link" oninput="updateSourceCode()"><br>
-    
+
     <label for="server1Name">اسم السيرفر [ 1 ]</label><br>
     <input type="text" id="server1Name" name="server1Name" oninput="updateSourceCode()"><br>
     <hr>
   </div>
-  
+  <button type="button" onclick="addServerFields()">إضافة سيرفر إضافي</button>
+
+  <hr>
+
   <div id="downloadFieldsContainer">
-    <!-- حقول التنزيل -->
-    <br><br>
     <label for="downloadLink1">رابط التنزيل [ 1 ]</label><br>
     <input type="text" id="downloadLink1" name="downloadLink1" oninput="updateSourceCode()"><br>
-    
+
     <label for="downloadButtonName1">اسم زر التنزيل [ 1 ]</label><br>
     <input type="text" id="downloadButtonName1" name="downloadButtonName1" oninput="updateSourceCode()"><br>
     
-    <label for="quality1">جودة الفيلم [ 1 ]</label><br>
+    <label for="quality1">جودة الفيلم [1 ]</label><br>
     <select id="quality1" name="quality1" onchange="updateSourceCode()">
+      <option value="">فراغ</option>
       <option value="BluRay">BluRay</option>
       <option value="BRrip">BRrip</option>
       <option value="BDRip">BDRip</option>
@@ -297,24 +336,28 @@ function copySourceCode() {
       <option value="WEBRip">WEBRip</option>
     </select><br>
     
-    <label for="videoPlayerName1">اسم مشغل الفيديو [ 1 ]</label><br>
+    <label for="videoPlayerName1">اسم مشغل الفيديو [1 ]</label><br>
     <select id="videoPlayerName1" name="videoPlayerName1" onchange="updateSourceCode()">
+      <option value="">فراغ</option>
       <option value="VLC">VLC</option>
       <option value="Mx Player">Mx Player</option>
     </select><br><br>
 
+    <label for="downloadOption1"> [ 1 ]مشاهدة او ملف ترجمة</label><br>
+    <select id="downloadOption1" name="downloadOption1" onchange="updateSourceCode()">
+      <option value="play">مشاهدة</option>
+      <option value="cc">ملف ترجمة</option>
+    </select><br><br>
+
     <hr>
   </div>
-  
-  <button type="button" onclick="addServerFields()">إضافة سيرفر جديدة</button>
-  <button type="button" onclick="addDownloadFields()">إضافة تنزيل جديدة</button>
-</form> 
+  <button type="button" onclick="addDownloadFields()">إضافة خيار تنزيل إضافي</button>
 
-<div>
-  <h3>السورس كود المحدث:</h3>
-  <textarea id="sourceCode" rows="10" cols="80"></textarea>
-  <button id="copyBtn" onclick="copySourceCode()">نسخ السورس كود</button>
-</div>
+  <hr>
+
+  <textarea id="sourceCode" rows="10"></textarea><br>
+  <button type="button" id="copyBtn" onclick="copySourceCode()">نسخ الكود</button>
+</form>
 
 </body>
 </html>
