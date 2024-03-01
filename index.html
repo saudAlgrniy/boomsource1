@@ -104,9 +104,9 @@ function addServerFields() {
 function addDownloadFields() {
   downloadFieldsCount++;
   var downloadFieldsContainer = document.getElementById("downloadFieldsContainer");
-  downloadFieldsContainer.innerHTML += `
+  var downloadFieldsHTML = `
     <label for="downloadLink${downloadFieldsCount}">رابط التنزيل [ ${downloadFieldsCount} ]</label><br>
-<input type="text" id="downloadLink${downloadFieldsCount}" name="downloadLink${downloadFieldsCount}" oninput="updateSourceCode()"><br>
+<input type="text" id="downloadLink${downloadFieldsCount}" name="downloadLink${downloadFieldsCount}" value="${document.getElementById('downloadLink1').value}" oninput="updateSourceCode()"><br>
 
 <label for="downloadButtonName${downloadFieldsCount}">اسم زر التنزيل [ ${downloadFieldsCount} ]</label><br>
 <input type="text" id="downloadButtonName${downloadFieldsCount}" name="downloadButtonName${downloadFieldsCount}" oninput="updateSourceCode()"><br>
@@ -123,11 +123,10 @@ function addDownloadFields() {
     </select><br>
     
     <label for="videoPlayerName${downloadFieldsCount}">اسم مشغل الفيديو [${downloadFieldsCount} ]</label><br>
-    <select id="videoPlayerName${downloadFieldsCount}" name="videoPlayerName${downloadFieldsCount}" onchange="updateSourceCode()">
+    <select id="videoPlayerName${downloadFieldsCount}" name="videoPlayerName${downloadFieldsCount}" onchange="toggleDisplayNameField(${downloadFieldsCount}); updateSourceCode()">
       <option value="">فراغ</option>
       <option value="VLC">VLC</option>
       <option value="Mx Player">Mx Player</option>
-      
     </select><br><br>
 
     <label for="downloadOption${downloadFieldsCount}">خيار التنزيل [${downloadFieldsCount} ]</label><br>
@@ -136,21 +135,30 @@ function addDownloadFields() {
       <option value="cc">ملف ترجمة</option>
     </select><br><br>
 
+    <label for="videoPlayerDisplayName${downloadFieldsCount}">اسم العرض في المشغل [${downloadFieldsCount} ]</label><br>
+    <input type="text" id="videoPlayerDisplayName${downloadFieldsCount}" name="videoPlayerDisplayName${downloadFieldsCount}" oninput="updateSourceCode()" disabled><br>
+    
     <hr>
   `;
+  downloadFieldsContainer.insertAdjacentHTML('beforeend', downloadFieldsHTML);
   updateSourceCode();
+}
+
+function toggleDisplayNameField(index) {
+  var playerSelect = document.getElementById(`videoPlayerName${index}`);
+  var displayNameField = document.getElementById(`videoPlayerDisplayName${index}`);
+  displayNameField.disabled = playerSelect.value !== "Mx Player";
 }
 
 function updateSourceCode() {
   // احصل على قيم حقول الإدخال من المستخدم
   var image1 = document.getElementById("image1").value;
   var story = document.getElementById("story").value;
-  var title = document.getElementById("title").value;
+  var title =document.getElementById("title").value;
   var category = Array.from(document.getElementById("category").selectedOptions).map(option => option.value).join(', ');
   var duration = document.getElementById("duration").value;
   var contentType = document.getElementById("contentType").value; // قيمة نوع المحتوى
-  
-  // تحديث السورس كود مع القيم المدخلة
+   // تحديث السورس كود مع القيم المدخلة
   var sourceCode = `
 <p>&nbsp;</p>
 <div class="separator" style="clear: both; text-align: center;">
@@ -159,7 +167,7 @@ function updateSourceCode() {
   </a>
 </div>
 <br /><p></p>
-<br />
+<br/>
 <div class="taqdim-post">
   <ul>
     <li>
@@ -239,13 +247,20 @@ function getServerFieldsHTML() {
 function getDownloadFieldsHTML() {
   var downloadFieldsHTML = "";
   for (var i = 1; i <= downloadFieldsCount; i++) {
+    var downloadLink = document.getElementById('downloadLink'+i).value;
+    var videoPlayerName = document.getElementById('videoPlayerName'+i).value;
+    if (videoPlayerName === "Mx Player") {
+      downloadLink = 'intent:' + downloadLink + '#Intent;package=com.mxtech.videoplayer.ad;S.title=' + document.getElementById('videoPlayerDisplayName'+i).value + ';end';
+    } else if (videoPlayerName === "VLC") {
+      downloadLink = 'vlc://' + downloadLink;
+    }
     downloadFieldsHTML += `
       <li>
-        <a target="_blank" rel="nofollow" href="${document.getElementById('downloadLink'+i).value}">
+        <a target="_blank" rel="nofollow" href="${downloadLink}">
           <i class="fa fa-${document.getElementById('downloadOption'+i).value}"></i>
           <span class="name">${document.getElementById('downloadButtonName'+i).value}</span>
           <span class="quality">${document.getElementById('quality'+i).value}</span>
-          <span class="size">${document.getElementById('videoPlayerName'+i).value}</span>
+          <span class="size">${videoPlayerName}</span>
         </a>
       </li>
     `;
@@ -254,110 +269,92 @@ function getDownloadFieldsHTML() {
 }
 
 function copySourceCode() {
-  var sourceCodeTextArea = document.getElementById("sourceCode");
-  sourceCodeTextArea.select();
+  var copyText = document.getElementById("sourceCode");
+  copyText.select();
+  copyText.setSelectionRange(0, 99999);
   document.execCommand("copy");
+  alert("تم نسخ السورس كود بنجاح");
 }
 </script>
 </head>
 <body>
-
 <form>
-  <label for="contentType">نوع المحتوى</label><br>
-  <select id="contentType" name="contentType" onchange="updateSourceCode()">
-    <option value="الفيلم">الفيلم</option>
-    <option value="المسلسل">المسلسل</option>
-  </select><br><br>
+<h3>&nbsp;&nbsp;&nbsp;&nbsp;⇩ قسم معلومات الفيلم او المسلسل ⇩</h3><hr>
+<label for="contentType">نوع المحتوى</label><br>
+<select id="contentType" name="contentType" onchange="updateSourceCode()">
+  <option value="الفيلم">الفيلم</option>
+  <option value="المسلسل">المسلسل</option>
+</select><br><br>
 
-  <label for="image1">رابط بوستر الفيلم أو المسلسل</label><br>
-  <input type="text" id="image1" name="image1" oninput="updateSourceCode()"><br>
-  
-  <label for="story">قصة الفيلم أو المسلسل</label><br>
-  <textarea id="story" name="story" rows="4" cols="50" oninput="updateSourceCode()"></textarea><br>
-  
-  <label for="title">اسم الفيلم أو المسلسل</label><br>
-  <input type="text" id="title" name="title" oninput="updateSourceCode()"><br>
-  
-  <label for="category">تصنيف الفيلم أو المسلسل</label><br>
-  <select id="category" name="category" onchange="updateSourceCode()" multiple>
-    <option value="دراما">دراما</option>
-    <option value="حركة">حركة</option>
-    <option value="جريمة">جريمة</option>
-    <option value="رعب">رعب</option>
-    <option value="خيال علمي">خيال علمي</option>
-    <option value="كوميديا">كوميديا</option>
-    <option value="رومانسية">رومانسية</option>
-    <option value="مغامرة">مغامرة</option>
-    <option value="وثائقي">وثائقي</option>
-    <option value="تاريخي">تاريخي</option>
-    <option value="حربي">حربي</option>
-    <option value="خيالي">خيالي</option>
-    <option value="إثارة">إثارة</option>
-    <option value="رومانسية درامية">رومانسية درامية</option>
-    <option value="فانتازيا">فانتازيا</option>
-    <option value="رسوم متحركة">رسوم متحركة</option>
-    <option value="عائلي">عائلي</option>
-    <option value="موسيقى">موسيقى</option>
-    <option value="رياضة">رياضة</option>
-  </select><br><br>
-  
-  <label for="duration">مدة الفيلم أو المسلسل</label><br>
-  <input type="text" id="duration" name="duration" oninput="updateSourceCode()"><br>
 
-  <hr>
+<label for="image1">رابط الصورة</label><br>
+<input type="text" id="image1" name="image1" oninput="updateSourceCode()"><br>
 
-  <div id="serverFieldsContainer">
-    <label for="server1Link">رابط السيرفر [ 1 ]</label><br>
-    <input type="text" id="server1Link" name="server1Link" oninput="updateSourceCode()"><br>
+<label for="story">القصة</label><br>
+<textarea id="story" name="story" rows="4" cols="50" oninput="updateSourceCode()"></textarea><br>
 
-    <label for="server1Name">اسم السيرفر [ 1 ]</label><br>
-    <input type="text" id="server1Name" name="server1Name" oninput="updateSourceCode()"><br>
-    <hr>
-  </div>
-  <button type="button" onclick="addServerFields()">إضافة سيرفر إضافي</button>
+<label for="title">الاسم</label><br>
+<input type="text" id="title" name="title" oninput="updateSourceCode()"><br>
 
-  <hr>
+<label for="category">التصنيف</label><br>
+<select id="category" name="category" multiple="multiple" onchange="updateSourceCode()">
+  <option value="أكشن">أكشن</option>
+  <option value="مغامرات">مغامرات</option>
+  <option value="كوميدي">كوميدي</option>
+  <option value="دراما">دراما</option>
+</select><br>
 
-  <div id="downloadFieldsContainer">
-    <label for="downloadLink1">رابط التنزيل [ 1 ]</label><br>
-    <input type="text" id="downloadLink1" name="downloadLink1" oninput="updateSourceCode()"><br>
+<label for="duration">مدة العرض</label><br>
+<input type="text" id="duration" name="duration" oninput="updateSourceCode()"><hr><br><br><br><h3>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⇩ قسم السيرفرات ⇩</h3><hr>
 
-    <label for="downloadButtonName1">اسم زر التنزيل [ 1 ]</label><br>
-    <input type="text" id="downloadButtonName1" name="downloadButtonName1" oninput="updateSourceCode()"><br>
-    
-    <label for="quality1">جودة الفيلم [1 ]</label><br>
-    <select id="quality1" name="quality1" onchange="updateSourceCode()">
-      <option value="">فراغ</option>
-      <option value="BluRay">BluRay</option>
-      <option value="BRrip">BRrip</option>
-      <option value="BDRip">BDRip</option>
-      <option value="WEB-DL">WEB-DL</option>
-      <option value="DVDRip">DVDRip</option>
-      <option value="WEBRip">WEBRip</option>
-    </select><br>
-    
-    <label for="videoPlayerName1">اسم مشغل الفيديو [1 ]</label><br>
-    <select id="videoPlayerName1" name="videoPlayerName1" onchange="updateSourceCode()">
-      <option value="">فراغ</option>
-      <option value="VLC">VLC</option>
-      <option value="Mx Player">Mx Player</option>
-    </select><br><br>
+<label for="server1Link">رابط السيرفر [ 1 ]</label><br>
+<input type="text" id="server1Link" name="server1Link" oninput="updateSourceCode()"><br>
 
-    <label for="downloadOption1"> [ 1 ]مشاهدة او ملف ترجمة</label><br>
-    <select id="downloadOption1" name="downloadOption1" onchange="updateSourceCode()">
-      <option value="play">مشاهدة</option>
-      <option value="cc">ملف ترجمة</option>
-    </select><br><br>
+<label for="server1Name">اسم السيرفر [ 1 ]</label><br>
+<input type="text" id="server1Name" name="server1Name" oninput="updateSourceCode()"><br><hr>
 
-    <hr>
-  </div>
-  <button type="button" onclick="addDownloadFields()">إضافة خيار تنزيل إضافي</button>
+<div id="serverFieldsContainer"></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type="button" onclick="addServerFields()">إضافة سيرفر جديد</button><br><br><br><br><br><br><h3>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;⇩ قسم المشاهدة الخارجية ⇩</h3><hr>
 
-  <hr>
+<label for="downloadLink1">رابط التنزيل [ 1 ]</label><br>
+<input type="text" id="downloadLink1" name="downloadLink1" oninput="updateSourceCode()"><br>
 
-  <textarea id="sourceCode" rows="10"></textarea><br>
-  <button type="button" id="copyBtn" onclick="copySourceCode()">نسخ الكود</button>
+<label for="downloadButtonName1">اسم زر التنزيل [ 1 ]</label><br>
+<input type="text" id="downloadButtonName1" name="downloadButtonName1" oninput="updateSourceCode()"><br>
+
+<label for="quality1">جودة الفيلم [ 1 ]</label><br>
+<select id="quality1" name="quality1" onchange="updateSourceCode()">
+  <option value="">فراغ</option>
+  <option value="BluRay">BluRay</option>
+  <option value="BRrip">BRrip</option>
+  <option value="BDRip">BDRip</option>
+  <option value="WEB-DL">WEB-DL</option>
+  <option value="DVDRip">DVDRip</option>
+  <option value="WEBRip">WEBRip</option>
+</select><br>
+
+<label for="videoPlayerName1">اسم مشغل الفيديو [ 1 ]</label><br>
+<select id="videoPlayerName1" name="videoPlayerName1" onchange="toggleDisplayNameField(1); updateSourceCode()">
+  <option value="">فراغ</option>
+  <option value="VLC">VLC</option>
+  <option value="Mx Player">Mx Player</option>
+</select><br><br>
+
+<label for="downloadOption1">خيار التنزيل [ 1 ]</label><br>
+<select id="downloadOption1" name="downloadOption1" onchange="updateSourceCode()">
+  <option value="play">مشاهدة</option>
+  <option value="cc">ملف ترجمة</option>
+</select><br><br>
+
+<label for="videoPlayerDisplayName1">اسم العرض في المشغل [ 1 ]</label><br>
+<input type="text" id="videoPlayerDisplayName1" name="videoPlayerDisplayName1" oninput="updateSourceCode()" disabled><br><hr>
+
+<div id="downloadFieldsContainer"></div>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type="button" onclick="addDownloadFields()">إضافة تنزيل جديد</button><br><br>
+
+<textarea id="sourceCode" rows="10" readonly></textarea><br>
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type="button" id="copyBtn" onclick="copySourceCode()">نسخ السورس كود</button>
 </form>
-
 </body>
 </html>
